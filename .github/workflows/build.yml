@@ -24,22 +24,22 @@ jobs:
     - name: Copy app into Epsilon
       run: |
         mkdir -p epsilon/apps/sudoku
-        # Copie tous les fichiers sauf .github et epsilon
         rsync -av --exclude='.github' --exclude='epsilon' ./ epsilon/apps/sudoku/
 
     - name: Register app
       run: |
-        # Ajoute 'sudoku' à la liste APPS si pas déjà présent
+        # Ajoute 'sudoku' à APPS si pas déjà présent
         sed -i '/^APPS/s/$/ sudoku/' epsilon/apps/Makefile || true
-        echo "APPS line after modification:"
+        echo "===== APPS line after modification ====="
         grep '^APPS' epsilon/apps/Makefile
 
     - name: Build NWA with debug
       run: |
+        set -x   # Affiche toutes les commandes
         cd epsilon
         make PLATFORM=n0110 nwa -j2 || true
         echo "===== Build log ====="
-        cat CMakeFiles/CMakeOutput.log || true
+        find . -name "*.log" -exec cat {} \;
 
     - name: List all .nwa files
       run: |
@@ -51,12 +51,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: sudoku-nwa
-        # Upload tous les .nwa générés
         path: |
           epsilon/**/*.nwa
-- name: Build NWA
-  run: |
-    cd epsilon
-    make PLATFORM=n0110 nwa || true
-    echo "===== Build log ====="
-    find . -name "*.log" -exec cat {} \;
