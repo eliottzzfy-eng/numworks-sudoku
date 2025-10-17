@@ -54,3 +54,9 @@ jobs:
         # Upload tous les .nwa générés
         path: |
           epsilon/**/*.nwa
+- name: Build NWA
+  run: |
+    cd epsilon
+    make PLATFORM=n0110 nwa || true
+    echo "===== Build log ====="
+    find . -name "*.log" -exec cat {} \;
