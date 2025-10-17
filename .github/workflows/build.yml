@@ -26,12 +26,15 @@ jobs:
         mkdir -p epsilon/apps/sudoku
         rsync -av --exclude='.github' --exclude='epsilon' ./ epsilon/apps/sudoku/
 
-    - name: Register app
+    - name: Register app safely
       run: |
-        # Ajoute 'sudoku' à APPS si pas déjà présent
-        sed -i '/^APPS/s/$/ sudoku/' epsilon/apps/Makefile || true
-        echo "===== APPS line after modification ====="
-        grep '^APPS' epsilon/apps/Makefile
+        if [ -f epsilon/apps/Makefile ]; then
+          sed -i '/^APPS/s/$/ sudoku/' epsilon/apps/Makefile
+          echo "===== APPS line after modification ====="
+          grep '^APPS' epsilon/apps/Makefile
+        else
+          echo "Makefile not found, skipping registration"
+        fi
 
     - name: Build NWA with debug
       run: |
