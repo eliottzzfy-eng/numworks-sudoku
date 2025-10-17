@@ -24,7 +24,7 @@ jobs:
     - name: Copy app into Epsilon
       run: |
         mkdir -p epsilon/apps/sudoku
-        # Copie tous les fichiers sauf .github et le dossier epsilon lui-même
+        # Copie tous les fichiers sauf .github et epsilon
         rsync -av --exclude='.github' --exclude='epsilon' ./ epsilon/apps/sudoku/
 
     - name: Register app
@@ -37,9 +37,15 @@ jobs:
         cd epsilon
         make PLATFORM=n0110 nwa -j2 || true
 
+    - name: List generated NWA files
+      run: |
+        cd epsilon
+        find . -name "*.nwa"
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: sudoku-nwa
+        # Chemin dynamique vers tout fichier .nwa généré
         path: |
-          epsilon/output/release/n0110/*.nwa
+          epsilon/**/*.nwa
