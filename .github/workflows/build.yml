@@ -1,39 +1,45 @@
 name: Build NumWorks NWA
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
-    - name: Install deps
+
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git build-essential cmake python3 python3-pip
-    - name: Clone Epsilon
+        sudo apt-get install -y git build-essential cmake python3 python3-pip rsync
+
+    - name: Clone Epsilon SDK
       run: |
         git clone --depth 1 https://github.com/numworks/epsilon.git epsilon
-    - name: Copy app into epsilon
+
+    - name: Copy app into Epsilon
       run: |
-        rm -rf epsilon/apps/sudoku || true
         mkdir -p epsilon/apps/sudoku
-        cp -r ./* epsilon/apps/sudoku/
-        rm -rf epsilon/apps/sudoku/.github
-        # ensure not copying the github workflow into the app folder
-        rm -rf epsilon/apps/sudoku/.github || true
+        # Copie tous les fichiers sauf .github et le dossier epsilon lui-même
+        rsync -av --exclude='.github' --exclude='epsilon' ./ epsilon/apps/sudoku/
+
     - name: Register app
       run: |
-        # add sudoku to APPS list if not present (simple append for many SDK versions)
+        # Ajoute 'sudoku' à la liste APPS si pas déjà présent
         sed -i '/^APPS/s/$/ sudoku/' epsilon/apps/Makefile || true
-    - name: Build .nwa
+
+    - name: Build NWA
       run: |
         cd epsilon
         make PLATFORM=n0110 nwa -j2 || true
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: sudoku-nwa
         path: |
           epsilon/output/release/n0110/*.nwa
-          
