@@ -17,7 +17,8 @@ jobs:
     - name: Copy app into epsilon
       run: |
         rm -rf epsilon/apps/sudoku || true
-        cp -r ./sudoku_epsilon_complete/* epsilon/apps/sudoku/
+        cp -r ./* epsilon/apps/sudoku/
+        rm -rf epsilon/apps/sudoku/.github
         # ensure not copying the github workflow into the app folder
         rm -rf epsilon/apps/sudoku/.github || true
     - name: Register app
