@@ -35,3 +35,4 @@ jobs:
         name: sudoku-nwa
         path: |
           epsilon/output/release/n0110/*.nwa
+          
