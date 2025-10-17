@@ -31,21 +31,26 @@ jobs:
       run: |
         # Ajoute 'sudoku' à la liste APPS si pas déjà présent
         sed -i '/^APPS/s/$/ sudoku/' epsilon/apps/Makefile || true
+        echo "APPS line after modification:"
+        grep '^APPS' epsilon/apps/Makefile
 
-    - name: Build NWA
+    - name: Build NWA with debug
       run: |
         cd epsilon
         make PLATFORM=n0110 nwa -j2 || true
+        echo "===== Build log ====="
+        cat CMakeFiles/CMakeOutput.log || true
 
-    - name: List generated NWA files
+    - name: List all .nwa files
       run: |
         cd epsilon
+        echo "===== Listing all .nwa files ====="
         find . -name "*.nwa"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: sudoku-nwa
-        # Chemin dynamique vers tout fichier .nwa généré
+        # Upload tous les .nwa générés
         path: |
           epsilon/**/*.nwa
