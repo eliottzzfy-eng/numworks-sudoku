@@ -17,6 +17,7 @@ jobs:
     - name: Copy app into epsilon
       run: |
         rm -rf epsilon/apps/sudoku || true
+        mkdir -p epsilon/apps/sudoku
         cp -r ./* epsilon/apps/sudoku/
         rm -rf epsilon/apps/sudoku/.github
         # ensure not copying the github workflow into the app folder
