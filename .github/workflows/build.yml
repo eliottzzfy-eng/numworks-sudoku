@@ -1,0 +1,36 @@
+name: Build NumWorks NWA
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git build-essential cmake python3 python3-pip
+    - name: Clone Epsilon
+      run: |
+        git clone --depth 1 https://github.com/numworks/epsilon.git epsilon
+    - name: Copy app into epsilon
+      run: |
+        rm -rf epsilon/apps/sudoku || true
+        cp -r ./sudoku_epsilon_complete/* epsilon/apps/sudoku/
+        # ensure not copying the github workflow into the app folder
+        rm -rf epsilon/apps/sudoku/.github || true
+    - name: Register app
+      run: |
+        # add sudoku to APPS list if not present (simple append for many SDK versions)
+        sed -i '/^APPS/s/$/ sudoku/' epsilon/apps/Makefile || true
+    - name: Build .nwa
+      run: |
+        cd epsilon
+        make PLATFORM=n0110 nwa -j2 || true
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sudoku-nwa
+        path: |
+          epsilon/output/release/n0110/*.nwa
